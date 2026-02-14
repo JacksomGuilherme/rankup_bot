@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js')
+const { SlashCommandBuilder, MessageFlags } = require('discord.js')
 const { loadApprovals, saveApprovals } = require('../../public/approvals')
 
 const { montaCardBoost, montaCardCotacao, montaCardFinal, montaCardTotal, calcularTotal, handleCancel } = require('../../controllers/boostController.js')
@@ -110,7 +110,7 @@ async function handleStep2(i, session, interaction) {
     if (i.isButton() && i.customId === 'next') {
 
         if (!session.actualRank)
-            return i.reply({ content: 'Escolha um rank antes de continuar!', ephemeral: true })
+            return i.update({ content: 'Escolha um rank antes de continuar!', flags: MessageFlags.Ephemeral })
 
         session.step = 3
         return i.update(
@@ -129,7 +129,7 @@ async function handleStep3(i, session, interaction) {
     if (i.isButton() && i.customId === 'next') {
 
         if (!session.targetRank)
-            return i.reply({ content:'Escolha um rank antes de continuar!', ephemeral:true })
+            return i.update({ content:'Escolha um rank antes de continuar!', flags: MessageFlags.Ephemeral })
 
         session.step = 4
         return i.update(
@@ -212,6 +212,6 @@ async function sendToDMAndStaff(i, session, interaction) {
         content: 'Te enviei a cotação na DM! 📩',
         embeds: [],
         components: [],
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
     })
 }

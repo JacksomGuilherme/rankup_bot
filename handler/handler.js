@@ -52,7 +52,7 @@ module.exports = async (client) => {
                 }, 10000)
                 return interaction.reply({
                     content: `Ação não permitida. Só é possível executar esse comando em <#${process.env.COMMAND_CHANNEL}>`,
-                    ephemeral: true
+                    flags: MessageFlags.Ephemeral
                 })
             }
 
