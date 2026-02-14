@@ -129,7 +129,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
     },
 
     montaCardFinal(userId, actualRank, targetRank) {
-        let description = `<@${userId}> só mais algumas informações para finalizarmos:`
+        let description = `<@${userId}> confirme os rankings:`
 
         const embed = montaCard(
             'Cotação',
@@ -154,7 +154,8 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
 
         const options = []
 
-        if (targetRank !== "GC2" && targetRank !== "GC3") {
+        if (targetRank !== "GC2" && targetRank !== "GC3" &&
+            (targetRank.substring(0, 1) === 'C' || targetRank.substring(0, 1) === 'G')) {
             options.push({
                 label: 'Duo Boost (jogar junto)',
                 description: 'Valor dobra',
@@ -171,6 +172,8 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
         }
 
         if (options.length > 0) {
+            embed.setFooter({ text: 'Caso queira adicionar um serviço extra verifique os disponíveis abaixo'})
+
             rows.push(new ActionRowBuilder().addComponents(
                 new StringSelectMenuBuilder()
                     .setCustomId('extras')
@@ -220,7 +223,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
         )
 
         embed.addFields(blankFieldVertical)
-        
+
         embed.addFields(
             {
                 name: "Ranking atual:",
