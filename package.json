@@ -1,0 +1,17 @@
+{
+  "name": "rankup_bot",
+  "version": "1.0.0",
+  "description": "Um bot para o discord do mautei",
+  "main": "bot.js",
+  "scripts": {
+    "dev": "nodemon bot.js --ignore public/approvals.json",
+    "start": "node bot.js"
+  },
+  "author": "Jacksom Guilherme Novack dos Santos",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.3.1",
+    "nodemon": "^3.1.11"
+  }
+}
