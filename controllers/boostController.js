@@ -43,6 +43,18 @@ const blankFieldVertical = {
     inline: false
 }
 
+const buttonCancel =
+    new ButtonBuilder()
+        .setCustomId('cancel')
+        .setLabel('Cancelar')
+        .setStyle(ButtonStyle.Danger)
+
+const buttonBack =
+    new ButtonBuilder()
+        .setCustomId('back')
+        .setLabel('Voltar')
+        .setStyle(ButtonStyle.Secondary)
+
 module.exports = {
     montaCardBoost(userId) {
         const embed = montaCard(
@@ -66,13 +78,10 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
 
         rows.push(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId('boost_budget')
+                .setCustomId('next')
                 .setLabel('Iniciar Cotação')
                 .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId('cancel')
-                .setLabel('Cancelar')
-                .setStyle(ButtonStyle.Secondary)
+            buttonCancel
         ))
 
         return {
@@ -109,7 +118,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
 
         rows.push(new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
-                .setCustomId('actual_ranking')
+                .setCustomId('ranking')
                 .setPlaceholder(rankPlaceHolder)
                 .addOptions(rankingsAux)
         ))
@@ -119,10 +128,8 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
                 .setCustomId('next')
                 .setLabel('Próximo')
                 .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId('cancel')
-                .setLabel('Cancelar')
-                .setStyle(ButtonStyle.Secondary)
+            buttonBack,
+            buttonCancel
         ))
 
 
@@ -155,13 +162,14 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
 
         const options = []
 
-        if (targetRank !== "GC2" && targetRank !== "GC3" &&
-            (targetRank.substring(0, 1) === 'C' || targetRank.substring(0, 1) === 'G')) {
-            options.push({
-                label: 'Duo Boost (jogar junto)',
-                description: 'Valor dobra',
-                value: 'duo'
-            })
+        if (targetRank !== "GC2" && targetRank !== "GC3") {
+            if (actualRank.substring(0, 1) === 'C' || actualRank.substring(0, 1) === 'G') {
+                options.push({
+                    label: 'Duo Boost (jogar junto)',
+                    description: 'Valor dobra',
+                    value: 'duo'
+                })
+            }
         }
 
         if (targetRank.substring(0, 2) === 'GC') {
@@ -187,13 +195,11 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
 
         rows.push(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId('calc')
+                .setCustomId('next')
                 .setLabel('Calcular')
                 .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId('cancel')
-                .setLabel('Cancelar')
-                .setStyle(ButtonStyle.Secondary)
+            buttonBack,
+            buttonCancel
         ))
 
 
@@ -268,31 +274,15 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
 
         rows.push(new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId('send')
+                .setCustomId('next')
                 .setLabel('Enviar')
-                .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId('cancel')
-                .setLabel('Cancelar')
-                .setStyle(ButtonStyle.Secondary)
+                .setStyle(ButtonStyle.Success),
+            buttonBack,
+            buttonCancel
         ))
 
 
         return { embeds: [embed], components: rows, flags: MessageFlags.Ephemeral }
-    },
-
-    handleCancel(i, collector, interaction) {
-        collector.stop()
-
-        setTimeout(async () => {
-            interaction.deleteReply()
-        }, 5000)
-
-        return i.update({
-            content: 'Cotação cancelada.',
-            embeds: [],
-            components: []
-        })
     },
 
     calcularTotal(actualRank, targetRank, duoBoost, reward) {
@@ -322,7 +312,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
         }
 
         if (reward) total += 10
-        
+
         if (duoBoost) total *= 2
 
         return {

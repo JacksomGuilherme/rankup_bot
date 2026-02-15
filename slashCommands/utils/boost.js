@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, MessageFlags } = require('discord.js')
 const { loadApprovals, saveApprovals } = require('../../public/approvals')
 
-const { montaCardBoost, montaCardCotacao, montaCardFinal, montaCardTotal, calcularTotal, handleCancel } = require('../../controllers/boostController.js')
+const { montaCardBoost, montaCardCotacao, montaCardFinal, montaCardTotal, calcularTotal } = require('../../controllers/boostController.js')
 
 const approvals = loadApprovals()
 
@@ -69,7 +69,7 @@ module.exports = {
             if (!handler) return
 
             try {
-                await handler(i, session, interaction)
+                return handler(i, session, interaction)
             } catch (err) {
                 console.error(err)
             }
@@ -93,18 +93,36 @@ module.exports = {
     }
 }
 
+function handleCancel(i, collector, interaction) {
+    collector.stop()
+
+    setTimeout(async () => {
+        interaction.deleteReply()
+    }, 5000)
+
+    return i.update({
+        content: 'Cotação cancelada.',
+        embeds: [],
+        components: []
+    })
+}
+
 async function handleStep1(i, session, interaction) {
     if (!i.isButton()) return
 
     session.step = 2
-    await i.update(montaCardCotacao(interaction.user.id, true))
+    return renderStep(i, session, interaction)
 }
 
 async function handleStep2(i, session, interaction) {
 
-    if (i.isStringSelectMenu() && i.customId === 'actual_ranking') {
+    if (i.isStringSelectMenu() && i.customId === 'ranking') {
         session.actualRank = i.values[0]
         return i.deferUpdate()
+    }
+
+    if (i.isButton() && i.customId === 'back') {
+        session.step = 1
     }
 
     if (i.isButton() && i.customId === 'next') {
@@ -113,29 +131,29 @@ async function handleStep2(i, session, interaction) {
             return i.update({ content: 'Escolha um rank antes de continuar!', flags: MessageFlags.Ephemeral })
 
         session.step = 3
-        return i.update(
-            montaCardCotacao(interaction.user.id, false, session.actualRank)
-        )
     }
+    return renderStep(i, session, interaction)
 }
 
 async function handleStep3(i, session, interaction) {
 
-    if (i.isStringSelectMenu() && i.customId === 'actual_ranking') {
+    if (i.isStringSelectMenu() && i.customId === 'ranking') {
         session.targetRank = i.values[0]
         return i.deferUpdate()
+    }
+
+    if (i.isButton() && i.customId === 'back') {
+        session.step = 2
     }
 
     if (i.isButton() && i.customId === 'next') {
 
         if (!session.targetRank)
-            return i.update({ content:'Escolha um rank antes de continuar!', flags: MessageFlags.Ephemeral })
+            return i.update({ content: 'Escolha um rank antes de continuar!', flags: MessageFlags.Ephemeral })
 
         session.step = 4
-        return i.update(
-            montaCardFinal(interaction.user.id, session.actualRank, session.targetRank)
-        )
     }
+    return renderStep(i, session, interaction)
 }
 
 async function handleStep4(i, session, interaction) {
@@ -146,7 +164,11 @@ async function handleStep4(i, session, interaction) {
         return i.deferUpdate()
     }
 
-    if (i.isButton() && i.customId === 'calc') {
+    if (i.isButton() && i.customId === 'back') {
+        session.step = 3
+    }
+
+    if (i.isButton() && i.customId === 'next') {
         session.totalObject = calcularTotal(
             session.actualRank,
             session.targetRank,
@@ -161,57 +183,98 @@ async function handleStep4(i, session, interaction) {
             session.nick,
             session.plataforma
         )
-
-        return i.update(session.totalCard)
-    }
-
-    if (i.isButton() && i.customId === 'send') {
         session.step = 5
-        return sendToDMAndStaff(i, session, interaction)
     }
+    return renderStep(i, session, interaction)
 }
+
+
 
 async function sendToDMAndStaff(i, session, interaction) {
 
-    const dm = await interaction.user.createDM()
+    if (i.isButton() && i.customId === 'back') {
+        session.step = 4
 
-    const dmMsg = await dm.send({
-        content: 'Caso queira cancelar sua requisição reaja com ❌',
-        embeds: session.totalCard.embeds
-    })
-
-    await dmMsg.react('❌')
-
-    const staffCh = interaction.client.channels.cache.get(process.env.STAFF_CHANNEL)
-    const embed = session.totalCard.embeds[0]
-    embed.setDescription(`Pedido de boost de <@${interaction.user.id}>`)
-
-    const staffMsg = await staffCh.send({
-        content: 'Reagir com ✅ concluir | ❌ cancelar',
-        embeds: [embed]
-    })
-
-    await staffMsg.react('✅')
-    await staffMsg.react('❌')
-
-    approvals[dmMsg.id] = {
-        linkedId: staffMsg.id,
-        userId: interaction.user.id,
-        status: "PENDING"
+        return renderStep(i, session, interaction)
     }
+    
+    if (i.isButton() && i.customId === 'next') {
+        await i.reply({
+            content: 'Vou gravar seu pedido só um instante...',
+            embeds: [],
+            components: [],
+            flags: MessageFlags.Ephemeral
+        })
 
-    approvals[staffMsg.id] = {
-        linkedId: dmMsg.id,
-        userId: interaction.user.id,
-        status: "PENDING"
+        const dm = await interaction.user.createDM()
+    
+        const dmMsg = await dm.send({
+            content: 'Caso queira cancelar sua requisição reaja com ❌',
+            embeds: session.totalCard.embeds
+        })
+    
+        await dmMsg.react('❌')
+    
+        const staffCh = interaction.client.channels.cache.get(process.env.STAFF_CHANNEL)
+        const embed = session.totalCard.embeds[0]
+        embed.setDescription(`Pedido de boost de <@${interaction.user.id}>`)
+    
+        const staffMsg = await staffCh.send({
+            content: 'Reagir com ✅ concluir | ❌ cancelar',
+            embeds: [embed]
+        })
+    
+        await staffMsg.react('✅')
+        await staffMsg.react('❌')
+    
+        approvals[dmMsg.id] = {
+            linkedId: staffMsg.id,
+            userId: interaction.user.id,
+            status: "PENDING"
+        }
+    
+        approvals[staffMsg.id] = {
+            linkedId: dmMsg.id,
+            userId: interaction.user.id,
+            status: "PENDING"
+        }
+    
+        saveApprovals(approvals)
+    
+        return i.editReply({
+            content: 'Te enviei a cotação na DM! 📩',
+            embeds: [],
+            components: [],
+            flags: MessageFlags.Ephemeral
+        })
     }
+}
 
-    saveApprovals(approvals)
+async function renderStep(i, session, interaction) {
 
-    return i.update({
-        content: 'Te enviei a cotação na DM! 📩',
-        embeds: [],
-        components: [],
-        flags: MessageFlags.Ephemeral
-    })
+    switch (session.step) {
+
+        case 1:
+            return i.update(montaCardBoost(interaction.user.id))
+
+        case 2:
+            return i.update(
+                montaCardCotacao(interaction.user.id, true, session.actualRank)
+            )
+
+        case 3:
+            return i.update(
+                montaCardCotacao(interaction.user.id, false, session.actualRank)
+            )
+
+        case 4:
+            return i.update(
+                montaCardFinal(interaction.user.id, session.actualRank, session.targetRank)
+            )
+        case 5: 
+            return i.update(
+                session.totalCard
+            )
+
+    }
 }
