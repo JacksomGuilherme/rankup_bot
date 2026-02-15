@@ -54,10 +54,10 @@ Irei coletar algumas informações para te dar o valor para seu boost de conta o
             .addFields(
                 {
                     name: '💰 Valores',
-                    value: `O valor para cada rank é de **R$ 10,00**
-O valor para alcançar GC2 é **R$10,00** mais caro
-O valor para reward GC é **R$10,00**
-Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o dobro do valor`
+                    value: `O valor para cada rank é de **R$ 10,00**.
+O valor para alcançar GC2 é **R$10,00** mais caro.
+O valor para reward GC é **R$10,00**.
+Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o dobro do valor.`
                 }
             )
             .setFooter({ text: 'Clique no botão abaixo para iniciar a cotação do seu boost.' })
