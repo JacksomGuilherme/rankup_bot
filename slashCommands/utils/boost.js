@@ -199,7 +199,7 @@ async function sendToDMAndStaff(i, session, interaction) {
     }
     
     if (i.isButton() && i.customId === 'next') {
-        await i.reply({
+        await i.update({
             content: 'Vou gravar seu pedido só um instante...',
             embeds: [],
             components: [],
