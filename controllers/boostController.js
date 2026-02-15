@@ -321,8 +321,9 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
             total += 10
         }
 
-        if (duoBoost) total *= 2
         if (reward) total += 10
+        
+        if (duoBoost) total *= 2
 
         return {
             actualRanking: getRankingLabel(actualRank),
