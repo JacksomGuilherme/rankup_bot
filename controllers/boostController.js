@@ -55,6 +55,7 @@ Irei coletar algumas informações para te dar o valor para seu boost de conta o
                 {
                     name: '💰 Valores',
                     value: `O valor para cada rank é de **R$ 10,00**
+O valor para alcançar GC2 é **R$10,00** mais caro
 O valor para reward GC é **R$10,00**
 Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o dobro do valor`
                 }
@@ -172,7 +173,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
         }
 
         if (options.length > 0) {
-            embed.setFooter({ text: 'Caso queira adicionar um serviço extra verifique os disponíveis abaixo'})
+            embed.setFooter({ text: 'Caso queira adicionar um serviço extra verifique os disponíveis abaixo' })
 
             rows.push(new ActionRowBuilder().addComponents(
                 new StringSelectMenuBuilder()
@@ -316,7 +317,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
 
         let total = ranksToClimb * 10
 
-        if(targetRank === 'GC2'){
+        if (targetRank === 'GC2') {
             total += 10
         }
 
