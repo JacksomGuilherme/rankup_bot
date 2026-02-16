@@ -133,7 +133,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
         ))
 
 
-        return { embeds: [embed], components: rows, flags: MessageFlags.Ephemeral }
+        return { content: '', embeds: [embed], components: rows, flags: MessageFlags.Ephemeral }
     },
 
     montaCardFinal(userId, actualRank, targetRank) {
@@ -203,7 +203,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
         ))
 
 
-        return { embeds: [embed], components: rows, flags: MessageFlags.Ephemeral }
+        return { content: '', embeds: [embed], components: rows, flags: MessageFlags.Ephemeral }
     },
 
     montaCardTotal(userId, totalObject, targetRank, nick, plataforma) {
@@ -282,7 +282,7 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
         ))
 
 
-        return { embeds: [embed], components: rows, flags: MessageFlags.Ephemeral }
+        return { content: '', embeds: [embed], components: rows, flags: MessageFlags.Ephemeral }
     },
 
     calcularTotal(actualRank, targetRank, duoBoost, reward) {
