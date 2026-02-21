@@ -1,10 +1,7 @@
-const { SlashCommandBuilder, MessageFlags, codeBlock } = require('discord.js')
-const { loadApprovals, saveApprovals } = require('../../public/approvals')
+const { SlashCommandBuilder, MessageFlags } = require('discord.js')
 
 const { montaCardBoost, montaCardCotacao, montaCardFinal, montaCardTotal, calcularTotal } = require('../../controllers/boostController.js')
-
-const approvals = loadApprovals()
-
+const { saveMessage } = require('../../repositories/orders.repository.js')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -231,19 +228,9 @@ async function sendToDMAndStaff(i, session, interaction) {
         await staffMsg.react('✅')
         await staffMsg.react('❌')
 
-        approvals[dmMsg.id] = {
-            linkedId: staffMsg.id,
-            userId: interaction.user.id,
-            status: "PENDING"
-        }
+        saveMessage(interaction.user.id, dmMsg.id, staffMsg.id)
 
-        approvals[staffMsg.id] = {
-            linkedId: dmMsg.id,
-            userId: interaction.user.id,
-            status: "PENDING"
-        }
-
-        saveApprovals(approvals)
+        saveMessage(interaction.user.id, staffMsg.id, dmMsg.id)
 
         return i.editReply({
             content: 'Te enviei a cotação na DM! 📩',

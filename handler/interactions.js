@@ -1,5 +1,5 @@
-const { loadApprovals, saveApprovals } = require('../public/approvals.js')
 const { Events } = require('discord.js');
+const { getMessage, deleteMessage } = require('../repositories/orders.repository.js');
 
 module.exports = (client) => {
     client.on(Events.MessageReactionAdd, async (reaction, user) => {
@@ -8,8 +8,7 @@ module.exports = (client) => {
         let reactionMsgId = reaction.message.id
         let reactedOnDM = reaction.message.channel.type == 1
 
-        const approvals = loadApprovals()
-        const entry = approvals[reactionMsgId]
+        const entry = getMessage(reactionMsgId)
 
         if (!entry) return
 
@@ -22,12 +21,12 @@ module.exports = (client) => {
 
         try {
             if (reactedOnDM) {
-                await removerMensagens(client, reaction, reactionMsgId, entry.linkedId, entry.userId, process.env.STAFF_CHANNEL, status)
+                await removerMensagens(client, reaction, reactionMsgId, entry.linked_id, entry.user_id, process.env.STAFF_CHANNEL, status)
             } else {
-                await removerMensagens(client, reaction, entry.linkedId, reactionMsgId, entry.userId, process.env.STAFF_CHANNEL, status)
+                await removerMensagens(client, reaction, entry.linked_id, reactionMsgId, entry.user_id, process.env.STAFF_CHANNEL, status)
             }
         } finally {
-            deleteApprovalPair(approvals, reactionMsgId)
+            deleteOrderPair(entry)
         }
 
     })
@@ -66,14 +65,7 @@ async function removerMensagens(client, reaction, messageId, linkedMessageId, us
     }
 }
 
-function deleteApprovalPair(approvals, messageId) {
-    const entry = approvals[messageId]
-    if (!entry) return
-
-    const linkedId = entry.linkedId
-
-    delete approvals[messageId]
-    delete approvals[linkedId]
-
-    saveApprovals(approvals)
+function deleteOrderPair(entry) {
+    deleteMessage(entry.linked_id, true)
+    deleteMessage(entry.message_id, false)
 }
