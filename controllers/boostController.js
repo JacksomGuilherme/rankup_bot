@@ -68,7 +68,7 @@ Irei coletar algumas informações para te dar o valor para seu boost de conta o
                     name: '💰 Valores',
                     value: `O valor para cada rank é de **R$ 10,00**.
 O valor para alcançar GC2 é **R$10,00** mais caro.
-O valor para reward GC é **R$10,00**.
+O valor para reward é **R$10,00**.
 Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o dobro do valor.`
                 }
             )
@@ -172,13 +172,13 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
             }
         }
 
-        if (targetRank.substring(0, 2) === 'GC') {
-            options.push({
-                label: 'Reward de GC',
-                description: 'R$ 10,00',
-                value: 'reward'
-            })
-        }
+        let rankLabel = getRankingLabel(targetRank).split(" ")[0]
+
+        options.push({
+            label: `Reward de ${rankLabel}`,
+            description: 'R$ 10,00',
+            value: 'reward'
+        })
 
         if (options.length > 0) {
             embed.setFooter({ text: 'Caso queira adicionar um serviço extra verifique os disponíveis abaixo' })
@@ -251,15 +251,16 @@ Caso queira que o Mauteii boost a conta jogando junto com você, será cobrado o
                 inline: true
             }
         )
-        if (targetRank.substring(0, 2) === "GC") {
-            embed.addFields(
-                {
-                    name: "Reward de GC",
-                    value: totalObject.reward ? "Sim" : "Não",
-                    inline: true
-                }
-            )
-        }
+
+        let rankLabel = getRankingLabel(targetRank).split(" ")[0]
+
+        embed.addFields(
+            {
+                name: `Reward de ${rankLabel}`,
+                value: totalObject.reward ? "Sim" : "Não",
+                inline: true
+            }
+        )
 
         embed.addFields(blankFieldVertical)
 
