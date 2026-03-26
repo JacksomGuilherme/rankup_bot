@@ -1,6 +1,9 @@
 const { Client, GatewayIntentBits, Partials, Collection, Events } = require('discord.js');
 require("dotenv").config();
 
+const express = require('express');
+const app = express();
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -21,6 +24,16 @@ client.once(Events.ClientReady, async (readyClient) => {
 
 require('./handler/handler.js')(client)
 require('./handler/interactions.js')(client)
+
+app.use(express.json());
+
+app.get('/event', (req, res) => {
+  res.status(200).json({message:"Olá Mundo"})
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log('API rodando 🚀');
+});
 
 client.login(process.env.TOKEN)
 
