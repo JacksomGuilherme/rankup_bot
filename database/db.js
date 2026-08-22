@@ -7,4 +7,9 @@ db.exec(`CREATE TABLE IF NOT EXISTS order_messages (
     user_id TEXT NOT NULL    
 )`)
 
+db.exec(`CREATE TABLE IF NOT EXISTS analises_requests (
+    message_id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL    
+)`)
+
 module.exports = { db }

@@ -46,7 +46,7 @@ module.exports = async (client) => {
         client.on(Events.InteractionCreate, async (interaction) => {
             if (!interaction.isChatInputCommand()) return
 
-            if (interaction.commandName === 'boost' && interaction.channelId !== process.env.COMMAND_CHANNEL) {
+            if (interaction.commandName === 'analise' && interaction.channelId !== process.env.COMMAND_CHANNEL) {
                 setTimeout(async () => {
                     interaction.deleteReply()
                 }, 10000)
